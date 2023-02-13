@@ -3,6 +3,7 @@ import random
 import string
 import logging
 from investigations_api_wrapper import post_investigation, delete_investigation, get_investigations, put_investigation
+from investigation_response_validations import validate_investigation_json
 
 
 class TestInvestigationsGet:
@@ -68,13 +69,12 @@ class TestInvestigationsGet:
             get_list_information['post_response'].json()['investigationId'],
             get_list_information['after_post_response'].json()["investigations"]
         )
-        assert added_investigation['name'] == get_list_information['original_name'], (
-            f"expected the investigation name to be {get_list_information['original_name']},"
-            f" but it was {added_investigation['name']}")
-        assert added_investigation['amount'] == get_list_information['original_amount'], (
-            f"expected the investigation name to be {get_list_information['original_amount']},"
-            f" but it was {added_investigation['amount']}")
-
+        validate_investigation_json(
+            added_investigation,
+            get_list_information['original_name'],
+            get_list_information['original_amount']
+        )
+        
     def test_get_list_investigation_update_after_modification(self, get_list_information):
         """
         Verify the list is updated after an investigation is changed
@@ -83,12 +83,11 @@ class TestInvestigationsGet:
             get_list_information['post_response'].json()['investigationId'],
             get_list_information['after_put_response'].json()["investigations"]
         )
-        assert modified_investigation['name'] == get_list_information['new_name'], (
-            f"expected the investigation name to be {get_list_information['new_name']},"
-            f" but it was {modified_investigation['name']}")
-        assert modified_investigation['amount'] == get_list_information['new_amount'], (
-            f"expected the investigation name to be {get_list_information['new_amount']},"
-            f" but it was {modified_investigation['amount']}")
+        validate_investigation_json(
+            modified_investigation,
+            get_list_information['new_name'],
+            get_list_information['new_amount']
+        )
 
     def test_get_list_investigation_update_after_removal(self, get_list_information):
         """
